@@ -31,6 +31,7 @@ size_t	ft_strchr(char *str, char c);
 char	*ft_strjoin(char *src, char *c_remaining, char c, size_t *pos);
 void	*ft_memmove(void *dest, void *src, size_t n);
 void	ft_memcpy(char *dest, char *src, ssize_t n);
+char	*get_next_line(int fd);
 
 #endif
 

@@ -28,29 +28,6 @@ void	ft_memcpy(char *dest, char *src, ssize_t n)
 		*p_dest++ = *p_src++;
 		n--;
 	}
-	*p_dest = '\0';
-}
-
-void	*ft_memmove(void *dest, void *src, size_t n)
-{
-	const unsigned char *p_src;
-	unsigned char	*p_dest;
-
-	p_dest = (unsigned char *)dest;
-	p_src = (const unsigned char *)src;
-	if (!p_src)
-		return (NULL);
-	if (p_dest <= p_src)
-		ft_memcpy(dest, src, n);
-	else
-	{
-		while (n > 0)
-		{
-			p_dest[n - 1] = p_src[n - 1];
-			n--;
-		}
-	}
-	return dest;
 }
 
 void	*ft_calloc(size_t nmemb, size_t size)
@@ -86,19 +63,6 @@ size_t	ft_strlen(char *str, char c)
 	return (i);
 }
 
-size_t	ft_strrchr(char *str, char c)
-{
-	ssize_t	i;
-
-	i = ft_strlen(str, '\0');
-	while (i >= 0)
-	{
-		if (str[i] == c)
-			return (1);
-		i--;
-	}
-	return (0);
-}
 
 size_t	ft_strchr(char *s, int c)
 {
@@ -119,43 +83,34 @@ size_t	ft_strchr(char *s, int c)
 char	*ft_strjoin(char *src, char *c_remaining, char c, size_t *pos)
 {
 	char	*result;
-	size_t i;
-	size_t j;
+	size_t	i;
+	size_t	j;
 
 	result = ft_calloc(ft_strlen(src, '\n') + ft_strlen(c_remaining, '\0') + ft_strchr(src, '\n') + 1,  sizeof(char));
+	if (!result)
+	{
+		free(c_remaining);
+		return (NULL);
+	}
 	i = 0;
 	j = 0;
-	if (!result)
-		return (NULL);
 	while (c_remaining && c_remaining[i])
 	{
 		result[i] = c_remaining[i];
 		i++;
 	}
-	while (src[j] != c && src[j])
+	while (src[j] && src[j] != c)
 	{
 		result[i + j] = src[j];
-		src[j] = '\0';
 		j++;
 	}
 	if (src[j] == c)
 	{
-		src[j] = '\0';
 		result[i + j] = '\n';
 		j++;
 	}
 	*pos = j;
-	// i = 0;
-	// j++;
-	// printf("j before:%zu\n", j);
-	// while (src[j])
-	// {
-	// 	j++;
-	// 	i++;
-	// }
-	// printf("j after:%zu\n", j);
-	// printf("i:%zu\n", i);
-	// ft_memmove(&src[j - i], src, i);
+	free(c_remaining);
 	return (result);
 }
 
