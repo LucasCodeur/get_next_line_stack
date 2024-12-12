@@ -13,55 +13,60 @@
 #include "get_next_line.h"
 
 
-char	*build_line(int fd, char *buffer)
+char	*build_line(int fd, char *buffer, size_t *pos)
 {
-
-}
-char	*get_the_line(int fd, char *buffer)
-{
-	char	*result;
+	char	*line;
 	int		nb_read;
-	size_t	i;
 
 	nb_read = -1;
-	result = NULL;
-	i = 0;
-	if (buffer[0] != '\0')
-	{
-		result = ft_strjoin(buffer, NULL, '\n', &i);
-		if (!result)
-		{
-			free(result);
-			return (NULL);
-		}
-		ft_memcpy(buffer, &buffer[i], ft_strlen(buffer + i, '\0') + 1);
-		if (result && ft_strchr(result, '\n') == 1)
-			return (result);
-	}
+	line = NULL;
 	while (nb_read != 0)
 	{
 		nb_read = read(fd, buffer, BUFFER_SIZE);
 		if (nb_read < 0)
 		{
-			free(result);
+			// free(line);
 			return (NULL);
 		}
 		buffer[nb_read] = '\0';
-		if (result && ft_strchr(result, '\n') == 1)
-			return (result);
+		if (line && ft_strchr(line, '\n') == 1)
+			return (line);
 		if (buffer[0] != '\0')
 		{
-			result = ft_strjoin(buffer, result, '\n', &i);
-			if (!result)
+			line = ft_strjoin(buffer, line, '\n', pos);
+			if (!line)
 				return (NULL);
 		}
-		ft_memcpy(buffer, &buffer[i], ft_strlen(buffer + i, '\0') + 1);
-		if (result && ft_strchr(result, '\n') == 1)
-			return (result);
-		if (buffer[0] == '\0' && !result)
+		ft_memcpy(buffer, &buffer[*pos], ft_strlen(buffer + *pos, '\0') + 1);
+		if (line && ft_strchr(line, '\n') == 1)
+			return (line);
+		if (buffer[0] == '\0' && !line)
 			return (NULL);
 	}
-	return (result);
+	return (line);
+}
+
+char	*get_the_line(int fd, char *buffer)
+{
+	char	*line;
+	size_t	i;
+
+	i = 0;
+	line = NULL;
+	if (buffer[0] != '\0')
+	{
+		line = build_line(fd, buffer, &i);
+		if (!line)
+		{
+			free(line);
+			return (NULL);
+		}
+		ft_memcpy(buffer, &buffer[i], ft_strlen(buffer + i, '\0') + 1);
+		if (line && ft_strchr(line, '\n') == 1)
+			return (line);
+	}
+	line = build_line(fd, buffer, &i);
+	return (line);
 }
 
 char	*get_next_line(int fd)
@@ -77,7 +82,7 @@ char	*get_next_line(int fd)
 		free(line);
 		line = NULL;
 	}
-	line = read_file(fd, buffer);
+	line = get_the_line(fd, buffer);
 	if (line == NULL)
 		return (NULL);
 	return (line);
@@ -86,14 +91,14 @@ char	*get_next_line(int fd)
 // int	main(void)
 // {
 // 	int	fd;
-// 	char	*result;
+// 	char	*line;
 //
 // 	fd = open("test.txt", O_RDONLY);
 // 	for (size_t i = 0; i < 4; i++)
 // 	{
-// 		result = get_next_line(fd);
-// 		printf("Final result :%s\n", result);
-// 		free(result);
+// 		line = get_next_line(fd);
+// 		printf("Final line :%s\n", line);
+// 		free(line);
 // 	}
 // 	close(fd);
 // 	return (0);

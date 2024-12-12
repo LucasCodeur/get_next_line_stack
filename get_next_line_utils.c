@@ -107,6 +107,7 @@ char	*ft_strjoin(char *src, char *c_remaining, char c, size_t *pos)
 	if (src[j] == c)
 	{
 		result[i + j] = '\n';
+		src[j] = '\0';
 		j++;
 	}
 	*pos = j;
